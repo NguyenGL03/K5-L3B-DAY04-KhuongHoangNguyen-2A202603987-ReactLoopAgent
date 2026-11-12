@@ -12,6 +12,8 @@ from scenarios import ScenarioTools
 from grading import grade_case, summarize, bonus_points
 from bonus.tools import BonusTools
 
+JUDGE_ATTEMPTS = 3
+
 
 def run_case(case, args):
     try:
@@ -21,11 +23,17 @@ def run_case(case, args):
         result = {'status': 'error', 'answer': '', 'trace': [], 'usage': [], 'error': f'{type(exc).__name__}: {str(exc)[:200]}'}
     if not isinstance(result, dict) or not isinstance(result.get('trace', []), list):
         result = {'status': 'error', 'answer': '', 'trace': [], 'usage': [], 'error': 'run_agent trả kết quả không hợp lệ.'}
-    try:
-        judge = Provider(args.judge_provider, args.judge_model)
-        grade = grade_case(case, result, judge)
-    except Exception as exc:
-        grade = {'score': None, 'status': 'unscored', 'reason': str(exc), 'judge_usage': {}}
+    # Judge LLM đôi khi trả JSON thiếu trường (vd. thiếu 'improvement') -> case unscored dù agent đã chạy xong.
+    # Chỉ gọi lại JUDGE (không chạy lại agent, không đổi cách chấm) tối đa JUDGE_ATTEMPTS lần; ghi số lần gọi.
+    for attempt in range(1, JUDGE_ATTEMPTS + 1):
+        try:
+            judge = Provider(args.judge_provider, args.judge_model)
+            grade = grade_case(case, result, judge)
+        except Exception as exc:
+            grade = {'score': None, 'status': 'unscored', 'reason': str(exc), 'judge_usage': {}}
+        grade['judge_attempts'] = attempt
+        if grade['status'] == 'scored' or not str(grade.get('reason', '')).startswith('Judge lỗi'):
+            break
     return {'id': case['id'], 'question': case['question'], 'expected': case['expected'],
             'scenario': case.get('scenario', 'normal'), 'provider': args.provider, 'model': args.model,
             'judge_provider': args.judge_provider, 'judge_model': args.judge_model, 'result': result, 'grade': grade}
@@ -33,7 +41,7 @@ def run_case(case, args):
 
 def main():
     parser = argparse.ArgumentParser(description='Chạy agent và chấm eval 0–100')
-    choices = ['openai', 'gemini', 'anthropic', 'openrouter']
+    choices = ['openai', 'gemini', 'anthropic', 'openrouter', 'ckey']
     parser.add_argument('--provider', choices=choices, default=os.getenv('PROVIDER', 'openai'))
     parser.add_argument('--model', default=os.getenv('MODEL'))
     parser.add_argument('--judge-provider', choices=choices, default=os.getenv('JUDGE_PROVIDER'))

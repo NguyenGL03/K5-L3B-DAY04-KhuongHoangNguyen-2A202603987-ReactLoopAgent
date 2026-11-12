@@ -9,6 +9,8 @@ CONFIG = {
     'gemini': ('GEMINI_API_KEY', 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions'),
     'openrouter': ('OPENROUTER_API_KEY', 'https://openrouter.ai/api/v1/chat/completions'),
     'anthropic': ('ANTHROPIC_API_KEY', 'https://api.anthropic.com/v1/messages'),
+    # CKEY (ckey.vn): API tương thích OpenAI, base URL theo trang https://ckey.vn/llm-api/setup.
+    'ckey': ('CKEY_API_KEY', 'https://api.xah.io/v1/chat/completions'),
 }
 
 

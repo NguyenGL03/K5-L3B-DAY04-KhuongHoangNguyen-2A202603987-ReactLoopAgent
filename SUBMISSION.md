@@ -56,3 +56,7 @@ Hạn trên áp dụng trừ khi key coach thông báo khác trong vòng 48 gi�
 - [x] Repo không chứa `.env` hay API key. Kiểm tra bằng `git ls-files | grep .env`, chỉ được thấy `.env.example`.
 - [x] Tên repo đúng quy tắc, đã thay `[HoVaTen]` và `[MSSV]`, mở được link khi chưa đăng nhập. (repo hiện tên `...-Day4-...`, quy tắc yêu cầu `...-DAY04-...`)
 - [x] Đã dán link repo lên LMS trước hạn.
+- [x] (Bonus) `python3 -m unittest discover -s bonus -p 'test_*.py' -v` không còn test lỗi. (3/3 OK)
+- [x] (Bonus) `eval_bonus.json` đủ 10 case đã chấm, `bonus_points_0_15` khác `null`. (99.5/100 → 14.92/15)
+- [x] (Bonus) `NOTES.md` có ghi chú retry, pagination, context và giới hạn.
+- [ ] (Bonus) Commit và push `agent.py`, `eval_bonus.json`, `NOTES.md`.
